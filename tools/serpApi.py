@@ -58,19 +58,19 @@ class SerpApiSearch:
                 snippets.append(snippet)
         return snippets
 
-    def execute_serp(self):
+    # def execute_serp(self):
 
-        # Create two tools for LLM
-        execute_tools = ToolNode(
-            [
-                StructuredTool.from_function(
-                    asyncio.run(self.search_serpapi()), name=AnswerQuestion.__name__
-                ),
-                StructuredTool.from_function(
-                    asyncio.run(self.search_serpapi()), name=ReviseAnswer.__name__
-                ),
-            ]
-        )
+    #     # Create two tools for LLM
+    #     execute_tools = ToolNode(
+    #         [
+    #             StructuredTool.from_function(
+    #                 asyncio.run(self.search_serpapi()), name=AnswerQuestion.__name__
+    #             ),
+    #             StructuredTool.from_function(
+    #                 asyncio.run(self.search_serpapi()), name=ReviseAnswer.__name__
+    #             ),
+    #         ]
+    #     )
 
 
 async def main():

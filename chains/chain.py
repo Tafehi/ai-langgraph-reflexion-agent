@@ -4,6 +4,7 @@ from langchain_ollama import ChatOllama
 from langchain_core.prompts import ChatPromptTemplate
 import datetime
 from dotenv import load_dotenv
+from langchain_core.prompts import PromptTemplate
 from chains.schema import AnswerQuestion, ReviseAnswer
 
 
@@ -19,12 +20,25 @@ class Chain:
             [
                 (
                     "system",
-                    """You are expert researcher.
-                    Current time: {time}
+                    """You are an expert researcher.
+                        Current time: {time}
 
-                    1. {first_instruction}
-                    2. Reflect and critique your answer. Be severe to maximize improvement.
-                    3. Recommend search queries to research information and improve your answer.""",
+                        Follow these steps:
+                        1. Provide a ~250 word detailed answer to the user's question.
+                        2. Reflect and critique your answer. Be specific and severe to maximize improvement.
+                        3. Recommend 1-3 search queries to improve your answer.
+
+                        Return your response in the following JSON format:
+                        ```json
+                        {
+                        "answer": "...",
+                        "reflection": {
+                            "missing": "...",
+                            "superfluous": "..."
+                        },
+                        "search_queries": ["...", "..."]
+                        }
+                        ```""",
                 ),
                 MessagesPlaceholder(variable_name="text"),
                 (
@@ -32,8 +46,6 @@ class Chain:
                     "Answer the user's question above using the required format.",
                 ),
             ]
-        ).partial(
-            time=lambda: datetime.datetime.now().isoformat(),
         )
 
     def __first_prompt_template(self):
@@ -42,22 +54,27 @@ class Chain:
         )
 
     # Generate the first answer
-    def first_responder(self):
+    # Langgraph chain/Node
+    def first_response(self):
         llm = ChatOllama(model=self._model)
         return self.__first_prompt_template() | llm.bind_tools(
             tools=[AnswerQuestion], tool_choice="AnswerQuestion"
         )
 
-    def __revised_instruction_template(self):
-        return """Reivse your answer using new information\n.
-        - You should use the previuos citique to add important information to your answer.\n
-        - You must include numerical citation in your revised answer to ensure it can be verified.\n
-        - Add a "References" section to the bottom of your answer (which dose not count toward the worl limits in the form of)\n.
-            - [1] https://example.com
-            - [2] https://example.com
-        - You should use the previous critique toi remove superfluous information from your answer and make SURE it is not more than 250 words.
-        """
 
+    def __revised_instruction_template(self):
+        return PromptTemplate.from_template(
+            """Revise your answer using new information:
+    - Use the previous critique to add important information.
+    - Include numerical citations in your revised answer.
+    - Add a "References" section at the bottom (not part of the word limit), e.g.:
+    - [1] https://example.com
+    - [2] https://example.com
+    - Remove superfluous information and keep the answer under 250 words."""
+        )
+
+
+    # Langgraph chain/Node
     def revision_response(self):
         llm = ChatOllama(model=self._model)
         return self.__revised_instruction_template | llm.bind_tools(

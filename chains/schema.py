@@ -20,4 +20,6 @@ class AnswerQuestion(BaseModel):
 class ReviseAnswer(AnswerQuestion):
     """Revise your original answer to your question."""
 
-    refrences: List[str] = Field(description="Citation motivating your update answer.")
+    references: List[str] = Field(
+        description="Citation motivating your updated answer."
+    )
