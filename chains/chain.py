@@ -1,56 +1,65 @@
-from pyclbr import Class
-from socket import timeout
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
 from langchain_ollama import ChatOllama
-import os
+from langchain_core.prompts import ChatPromptTemplate
+import datetime
 from dotenv import load_dotenv
+from chains.schema import AnswerQuestion, ReviseAnswer
 
 
-# from models.ollama_model import OllamaLLM
 class Chain:
     def __init__(self):
         load_dotenv()
-        self._model = os.getenv("OLLAMA_LLM")
+        self._model = "llama3.2:latest"  # OllamaLLM.get_llm()['llm_model']
+        self._jsn_parser = JsonOutputParser(return_id=True)
+        self._str_parser = StrOutputParser(tools=[AnswerQuestion])
 
-    def __reflection_prompt(self):
+    def _actor_prompt_template(self):
         return ChatPromptTemplate.from_messages(
             [
                 (
                     "system",
-                    """
-                You are a professional text editor and content strategist. Your task is to receive a piece of text and perform the following:
-                Critique the text:
-                Evaluate clarity, coherence, grammar, and tone.
-                Identify weaknesses in structure, engagement, and message delivery.
-                Highlight any inconsistencies or areas lacking impact.
-                finally improve the text.
+                    """You are expert researcher.
+                    Current time: {time}
 
-                """,
-                ),  # your full prompt here
+                    1. {first_instruction}
+                    2. Reflect and critique your answer. Be severe to maximize improvement.
+                    3. Recommend search queries to research information and improve your answer.""",
+                ),
                 MessagesPlaceholder(variable_name="text"),
-            ]
-        )
-
-    def __generation_prompt(self):
-        return ChatPromptTemplate.from_messages(
-            [
                 (
                     "system",
-                    """
-            you are a text editor assisstant tasked with writting excellent texts.
-            Generate the best text possible for the user's.
-            If the user provide critique, respond with a revised version of your previous attemps
-            Offer tips for future writing in similar contexts.
-            """,
-                ),  # your full prompt here
-                MessagesPlaceholder(variable_name="text"),
+                    "Answer the user's question above using the required format.",
+                ),
             ]
+        ).partial(
+            time=lambda: datetime.datetime.now().isoformat(),
         )
 
-    def generation_chain(self):
-        llm = ChatOllama(model=self._model)
-        return self.__generation_prompt() | llm
+    def __first_prompt_template(self):
+        return ChatPromptTemplate.from_messages(
+            [("system", "Provide a detailed ~250 word answer."), ("human", "{input}")]
+        )
 
-    def reflection_chain(self):
+    # Generate the first answer
+    def first_responder(self):
         llm = ChatOllama(model=self._model)
-        return self.__reflection_prompt() | llm
+        return self.__first_prompt_template() | llm.bind_tools(
+            tools=[AnswerQuestion], tool_choice="AnswerQuestion"
+        )
+
+    def __revised_instruction_template(self):
+        return """Reivse your answer using new information\n.
+        - You should use the previuos citique to add important information to your answer.\n
+        - You must include numerical citation in your revised answer to ensure it can be verified.\n
+        - Add a "References" section to the bottom of your answer (which dose not count toward the worl limits in the form of)\n.
+            - [1] https://example.com
+            - [2] https://example.com
+        - You should use the previous critique toi remove superfluous information from your answer and make SURE it is not more than 250 words.
+        """
+
+    def revision_response(self):
+        llm = ChatOllama(model=self._model)
+        return self.__revised_instruction_template | llm.bind_tools(
+            tools=[ReviseAnswer], tool_choice="ReviseAnswer"
+        )

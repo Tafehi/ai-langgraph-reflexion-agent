@@ -19,7 +19,7 @@ class Graph:
         result = self.chain.reflection_chain().invoke({"text": state})
         return [HumanMessage(content=result.content)]
 
-    def __should_countinue(self, state: Sequence[BaseMessage]):
+    def __should_continue(self, state: Sequence[BaseMessage]):
         return END if len(state) > 6 else self._REFLECT
 
     def build_chain(self):
@@ -29,7 +29,7 @@ class Graph:
         builder.set_entry_point(self._GENERATE)
         builder.add_conditional_edges(
             self._GENERATE,
-            self.__should_countinue,
+            self.__should_continue,
             {END: END, self._REFLECT: self._REFLECT},
         )
         builder.add_edge(self._REFLECT, self._GENERATE)

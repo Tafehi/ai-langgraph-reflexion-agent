@@ -2,6 +2,7 @@ from mcp.server.fastmcp import FastMCP
 
 mcp = FastMCP(name="promptgen", host="localhost", port=8002)
 
+
 @mcp.prompt()
 async def security_prompt() -> str:
     return (
@@ -27,7 +28,6 @@ async def system_prompt() -> str:
         "- Do not guess when a tool can provide a more accurate answer.\n"
         "- Clearly explain when you are using a tool and summarize the results for the user."
     )
-
 
 
 if __name__ == "__main__":
