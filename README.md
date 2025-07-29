@@ -2,6 +2,20 @@
 
 This repository demonstrates how to integrate multiple AI tools and services using a custom MCP (Multi-Component Protocol) server and client setup. The project showcases the following:
 
+1. Showcase how to connect to internet to fetch the latest information using `Internet ai agent and MCP Server`.
+
+2. Use `Tool` and `StateGraph` in `Langgraph` to build custome agent to:
+      - Ensures real-time data is always fetched
+      - Avoids relying on potentially outdated model knowledge.
+      - Gives you **full** control over the agent’s behavior.
+
+3. Fetch the response base on the user `input` and:
+      - Always invokes a tool first (`serpApi.py`).
+      - Then reasons based on the tool output.
+      - Use `Langgraph` and `reflexion` method to improve the LLM response.
+      - Iterate for continuous Self-Improvement and Learning
+---
+
 ## Features
 
 1. **Internet Access via SerpAPI**  

@@ -18,5 +18,6 @@ dependencies = [
     "mcp[cli]>=1.12.2",
     "python-dotenv>=1.1.1",
     "serpapi>=0.1.5",
+    "streamlit>=1.47.1",
     "tavily-python>=0.7.10",
 ]
