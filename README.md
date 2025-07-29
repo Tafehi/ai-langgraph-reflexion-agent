@@ -4,7 +4,7 @@ This repository demonstrates how to integrate multiple AI tools and services usi
 
 1. Showcase how to connect to internet to fetch the latest information using `Internet ai agent and MCP Server`.
 
-2. Use `Tool` and `StateGraph` in `Langgraph` to build custome agent to:
+2. Use `Tool` and `StateGraph` from `Langgraph` library to build custome agent to:
       - Ensures real-time data is always fetched
       - Avoids relying on potentially outdated model knowledge.
       - Gives you **full** control over the agent’s behavior.

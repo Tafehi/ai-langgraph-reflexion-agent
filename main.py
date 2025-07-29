@@ -11,7 +11,7 @@ def main(input: str):
     )
 
 if __name__ == "__main__":
-    input_text = "where is Oslo?"
+    input_text = "where is Oslo? fetch from internet"
     main(input_text)
 
 
