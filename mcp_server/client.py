@@ -64,6 +64,7 @@ async def agents(llm_model, llm_provider, question):
         raise RuntimeError(f"Failed to load tools or prompts: {eg}")
 
     print(f"Loaded Tools: {[tool.name for tool in tools]}")
+    #Binding LLM with tooles
     agent = create_react_agent(model=model["llm_model"], tools=tools)
 
     response = await agent.ainvoke(

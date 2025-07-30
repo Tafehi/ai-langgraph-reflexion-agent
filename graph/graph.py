@@ -4,6 +4,7 @@ from langgraph.graph import END, MessageGraph
 from chains.chain import Chain
 from chains.chain import Chain
 from tools.serpApi import SerpApiSearch
+from langgraph.prebuilt import ToolNode
 
 
 class Graph:
@@ -31,7 +32,7 @@ class Graph:
         chains = Chain()
         builder.add_node("draft", chains.first_response())
         serp = SerpApiSearch()
-        builder.add_node("serp_tool", serp)
+        builder.add_node("serp_tool", ToolNode(serp))
         builder.add_node("revised", chains.revision_response())
 
         builder.add_edge("draft", "serp_tool")

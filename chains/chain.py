@@ -53,13 +53,7 @@ class Chain:
             [("system", "Provide a detailed ~250 word answer."), ("human", "{input}")]
         )
 
-    # Generate the first answer
-    # Langgraph chain/Node
-    def first_response(self):
-        llm = ChatOllama(model=self._model)
-        return self.__first_prompt_template() | llm.bind_tools(
-            tools=[AnswerQuestion], tool_choice="AnswerQuestion"
-        )
+    
 
 
     def __revised_instruction_template(self):
@@ -79,4 +73,11 @@ class Chain:
         llm = ChatOllama(model=self._model)
         return self.__revised_instruction_template | llm.bind_tools(
             tools=[ReviseAnswer], tool_choice="ReviseAnswer"
+        )
+
+    # Generate the first answer
+    def first_response(self):
+        llm = ChatOllama(model=self._model)
+        return self.__first_prompt_template() | llm.bind_tools(
+            tools=[AnswerQuestion], tool_choice="AnswerQuestion"
         )

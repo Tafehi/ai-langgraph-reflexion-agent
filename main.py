@@ -1,26 +1,32 @@
 import asyncio
 from mcp_server import client
 from chains.chain import Chain
+from graph.graph import Graph
 import streamlit as st
 from langchain_core.messages import HumanMessage
 
 
 def main(input_text: str):
     # Optional: Run your custom agent logic
-    asyncio.run(client.agents("llama3.2:latest", "ollama", input_text))
+    # asyncio.run(client.agents("llama3.2:latest", "ollama", input_text))
 
-    # Initialize the chain
-    chain = Chain()
+    graph_instance = Graph(input_text)
+    compiled_graph = graph_instance.build_chain()
+    response = compiled_graph.invoke(input)
+    
+    # # Initialize the chain
+    # chain = Chain()
 
-    # Get the chain pipeline
-    chain_pipeline = chain.first_response()
+    # # Get the chain pipeline
+    # chain_pipeline = chain.first_response()
 
-    # Run the chain
-    result = chain_pipeline.invoke({"input": input_text})
+    # # Run the chain
+    # result = chain_pipeline.invoke({"input": input_text})
 
     # Print the result
     print("\n🔍 Chain result:\n")
-    print(result)
+    print(response)
+    # print(result)
 
 
 if __name__ == "__main__":
