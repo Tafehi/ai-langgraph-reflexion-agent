@@ -6,7 +6,7 @@ import datetime
 from dotenv import load_dotenv
 from langchain_core.prompts import PromptTemplate
 from chains.schema import AnswerQuestion, ReviseAnswer
-
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 class Chain:
     def __init__(self):
@@ -56,22 +56,26 @@ class Chain:
     
 
 
+
+
     def __revised_instruction_template(self):
-        return PromptTemplate.from_template(
-            """Revise your answer using new information:
+        return ChatPromptTemplate.from_messages([
+            MessagesPlaceholder(variable_name="text"),
+            ("system", """Revise your answer using new information:
     - Use the previous critique to add important information.
     - Include numerical citations in your revised answer.
     - Add a "References" section at the bottom (not part of the word limit), e.g.:
     - [1] https://example.com
     - [2] https://example.com
-    - Remove superfluous information and keep the answer under 250 words."""
-        )
+    - Remove superfluous information and keep the answer under 250 words.""")
+        ])
+
 
 
     # Langgraph chain/Node
     def revision_response(self):
         llm = ChatOllama(model=self._model)
-        return self.__revised_instruction_template | llm.bind_tools(
+        return self.__revised_instruction_template() | llm.bind_tools(
             tools=[ReviseAnswer], tool_choice="ReviseAnswer"
         )
 
