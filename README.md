@@ -19,16 +19,16 @@ This repository demonstrates how to integrate multiple AI tools and services usi
 
 5. Below you can find the LangGraph topology of how the Chatbot is interconnected and how it can imptove its response using SerApi to search the web for the latest information.
 
-<p align="center">
-      <img src="./pic/01.png" alt="Fig. 01 - LangGraph internal Topology" width="400" height="400"/>
-</p>
+  <p align="center">
+      <img src="./pics/01.png" alt="Fig. 01 - LangGraph internal Topology" width="400" height="400"/>
+  </p>
 
 
 6. Below also shows the `LangSmith` output of how `LangGraph` uses `SerpApi` to fetch the information from the web and how `LLM` loops internally to make the response improved.
 
-<p align="center">
-      <img src="./pic/02.png" alt="Fig. 02 - screenshot of LangSmith" width="700" height="700"/>
-</p>
+  <p align="center">
+      <img src="./pics/02.png" alt="Fig. 02 - screenshot of LangSmith" width="700" height="700"/>
+  </p>
 
 
 ---
